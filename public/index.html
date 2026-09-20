@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1a3a5c" />
+    <meta name="description" content="Employee Training and Certification Management System" />
+    <title>Training &amp; Certification MS</title>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('error', function(e) {
+        document.body.innerHTML += '<div style="color:red; background:white; position:fixed; top:0; left:0; width:100%; z-index:9999; font-size:24px; padding:20px;">ERROR: ' + e.message + '<br/>' + e.filename + ':' + e.lineno + '</div>';
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        document.body.innerHTML += '<div style="color:red; background:white; position:fixed; top:0; left:0; width:100%; z-index:9999; font-size:24px; padding:20px;">UNHANDLED PROMISE: ' + e.reason + '</div>';
+      });
+    </script>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

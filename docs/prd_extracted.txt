@@ -1,0 +1,386 @@
+﻿PRODUCT REQUIREMENTS DOCUMENT
+Employee Training & Certification Management System ΓÇö Frontend
+1. Project Overview
+Build a fully functional Employee Training & Certification Management System frontend using React with Create React App. The application will initially use a local mock database implemented with JSON/static data and React state. The data model must be structured so it can later be replaced by a Java/Spring Boot backend and relational database with minimal changes.
+The application has two roles:
+Admin
+Employee
+The implementation must cover the complete workflow in this document. All buttons, forms, navigation, CRUD operations, authentication, role handling, tabs, state updates, validation, and route protection must actually work. Do not create placeholder or partially functional features.
+2. Strict Technology Requirements
+Required:
+React
+Create React App
+React functional components
+React Hooks (useState, useEffect, useContext where appropriate)
+React Router
+Standard HTML
+Standard CSS
+Local mock data / React state
+Do NOT use:
+Vite
+Redux
+Next.js
+Tailwind CSS
+Bootstrap
+Material UI
+Ant Design
+Unnecessary state-management or UI libraries
+Backend services
+Database servers
+Keep the codebase simple, modular, readable, maintainable, and easy to migrate to a Java/Spring Boot backend.
+3. Primary Objective
+The completed application must allow the following.
+Admin:
+Log in
+View all employees
+Add employees
+Edit employee information
+Change an employee's role between Employee and Admin
+Delete employees
+Open an individual employee's details
+View that employee's certificates
+View that employee's assessment scores
+Log out
+Employee:
+Log in
+View their own profile
+View their own certificates
+View their own assessment scores
+Access only their own records
+Log out
+4. User Roles
+4.1 Admin
+Admin access includes:
+Admin Dashboard
+Employee list
+Add Employee
+Edit Employee
+Delete Employee
+Role management
+Employee details
+Certificates
+Assessment scores
+An Admin can view records belonging to all employees.
+4.2 Employee
+Employee access includes:
+Employee Dashboard
+Own profile
+Own certificates
+Own assessment scores
+Employees must not access the Admin Dashboard, employee management, other employees' records, deletion, or role management. Direct navigation to an admin URL must also be blocked.
+5. Authentication
+Login flow:
+User opens /login.
+User enters email and password.
+The application checks credentials against the local mock data.
+Valid Admin credentials route to /admin/dashboard.
+Valid Employee credentials route to /employee/dashboard.
+Invalid credentials remain on the login page and display a clear error.
+Authentication state must contain at minimum:
+id
+name
+email
+role
+Logout must clear authentication state, return the user to /login, and prevent access to protected pages.
+6. Mock Database Structure
+The mock data must be structured like a relational database. Use separate collections/entities rather than storing certificates and assessments only inside employee objects.
+Recommended entities:
+users
+employees
+certificates
+assessments
+designations
+Example User:
+{ id: 1, employeeId: 1, email: "admin@example.com", password: "admin123", role: "ADMIN" }
+Example Employee:
+{ id: 1, name: "John Doe", email: "john@example.com", designationId: 2 }
+Example Designation:
+{ id: 2, name: "Software Developer" }
+Example Certificate:
+{ id: 1, employeeId: 1, courseName: "Python Training", certificateName: "Python Training Certificate", issueDate: "2026-08-20" }
+Example Assessment:
+{ id: 1, employeeId: 1, trainingName: "Python Training", score: 85 }
+Relationships must remain:
+User ΓåÆ Employee
+Employee ΓåÆ Designation
+Employee ΓåÆ Certificates
+Employee ΓåÆ Assessments
+7. Admin Dashboard
+Route: /admin/dashboard
+The dashboard is the main administrative screen.
+Header must contain:
+System name
+Logged-in user's name
+Logged-in user's role
+Logout button
+Employee table must contain:
+Name
+Email
+Designation
+Role
+Actions
+Actions:
+View
+Edit
+Delete
+The table must update immediately after add, edit, delete, or role changes without requiring a page refresh.
+8. Add Employee
+Provide an Add Employee button that opens a functional form.
+Required fields:
+Name
+Email
+Password
+Designation
+Role
+Role should default to Employee, while the Admin may explicitly create an Admin.
+Validation:
+Required fields cannot be empty.
+Email must have a valid format.
+Email must be unique.
+Password cannot be empty.
+Designation cannot be empty.
+Invalid submissions must not create an employee.
+Successful creation must add both the employee record and corresponding login/user record, then update the dashboard immediately.
+9. Edit Employee
+Edit must open a form populated with existing employee data.
+Editable fields:
+Name
+Email
+Designation
+Role
+Password does not need to be changed through the normal edit operation.
+Role changes must update the corresponding authentication/user record and immediately reflect in the dashboard.
+10. Delete Employee
+Delete must require confirmation.
+If confirmed:
+Remove the employee.
+Remove the corresponding user/login record.
+Remove associated certificates and assessments so orphaned records cannot appear elsewhere.
+Update the dashboard immediately.
+If cancelled, no data may change.
+11. Employee Details
+Route: /admin/employees/:employeeId
+Display:
+Name
+Email
+Designation
+Role
+The page must contain exactly two main tabs:
+Certificates
+Assessments
+12. Certificates Tab
+Display only certificates belonging to the selected employee.
+Suggested columns: Certificate, Course, Issue Date.
+Filter records by employee ID. If none exist, display: ΓÇ£No certificates available.ΓÇ¥
+13. Assessments Tab
+Display only assessment records belonging to the selected employee.
+Suggested columns: Training, Score.
+Filter records by employee ID. If none exist, display: ΓÇ£No assessment records available.ΓÇ¥
+14. Tab Behavior
+Certificates and Assessments must be toggled using React state. Switching tabs must happen without a page reload and must preserve the selected employee.
+15. Employee Dashboard
+Route: /employee/dashboard
+Display personal:
+Name
+Email
+Designation
+Role
+Provide two read-only record sections/tabs:
+Certificates
+Assessments
+Records must be filtered using the logged-in employee's ID.
+16. Employee Read-Only Restrictions
+Employees must not see or use:
+Add buttons
+Edit buttons
+Delete buttons
+Role controls
+Other employees
+Admin dashboard
+Employee management
+Route protection must also prevent unauthorized access; hiding buttons alone is insufficient.
+17. Routing Requirements
+Minimum routes:
+/login
+/admin/dashboard
+/admin/employees/:employeeId
+/employee/dashboard
+Rules:
+Unauthenticated user accessing a protected route ΓåÆ /login
+Employee accessing /admin/* ΓåÆ /employee/dashboard
+Admin accessing /employee/dashboard may be redirected to /admin/dashboard
+18. Component Structure
+Suggested structure:
+src/components/Header.jsx
+src/components/EmployeeTable.jsx
+src/components/EmployeeForm.jsx
+src/components/EmployeeDetails.jsx
+src/components/CertificatesTab.jsx
+src/components/AssessmentsTab.jsx
+src/pages/Login.jsx
+src/pages/AdminDashboard.jsx
+src/pages/EmployeeDetailsPage.jsx
+src/pages/EmployeeDashboard.jsx
+src/data/mockData.js
+src/context/AuthContext.jsx
+src/App.js
+src/index.js
+src/styles/styles.css
+The agent may adjust the structure only when there is a clear technical reason and must not introduce unnecessary complexity.
+19. State Management
+Do not use Redux. Use React state and context where appropriate.
+The mock database/state must have a clear source of truth. Add, edit, delete, and role changes must update state and immediately update all relevant UI.
+20. UI Requirements
+Professional internal corporate-system appearance.
+Clean and modern layout.
+Responsive desktop-first design.
+Clear visual hierarchy.
+Restrained color palette.
+No excessive gradients.
+No excessive glassmorphism.
+No neon colors.
+No unnecessary animations.
+No decorative landing-page theme unrelated to employee management.
+21. Forms
+Forms must provide labels, inputs, clear actions, validation, error messages, and cancellation where appropriate.
+Form submission must actually modify application state. Do not use placeholder alerts, ΓÇ£Coming SoonΓÇ¥ buttons, or non-functional controls.
+22. Empty States
+No employees found.
+No certificates available.
+No assessment records available.
+23. Error Handling
+Invalid login
+Missing form fields
+Invalid email
+Duplicate email
+Invalid employee ID
+Unauthorized route access
+Empty certificates
+Empty assessments
+Invalid employee URLs must show ΓÇ£Employee not found.ΓÇ¥ and provide a way back to the Admin Dashboard.
+24. Data Consistency Rules
+Employee-specific records must always be filtered by employee ID.
+When an employee is deleted, dependent certificates and assessments must not remain as usable orphan records.
+Designation changes must update every place where the employee's designation is displayed.
+Role changes must update authentication and access control.
+25. Seed Data
+Provide enough mock data to demonstrate all required states:
+1 Admin
+3ΓÇô5 Employees
+Multiple designations
+Multiple certificates
+Multiple assessment records
+At least one employee with multiple certificates
+At least one employee with no certificates
+At least one employee with no assessments
+26. Functional Acceptance Criteria
+ΓÿÉ Login page works.
+ΓÿÉ Valid Admin login opens Admin Dashboard.
+ΓÿÉ Valid Employee login opens Employee Dashboard.
+ΓÿÉ Invalid credentials display an error.
+ΓÿÉ Logout works.
+ΓÿÉ Protected routes require authentication.
+ΓÿÉ Admin can view all employees.
+ΓÿÉ Admin can add an employee.
+ΓÿÉ New employee appears immediately.
+ΓÿÉ Admin can edit an employee.
+ΓÿÉ Edited information appears immediately.
+ΓÿÉ Admin can change employee role.
+ΓÿÉ Role change affects access control.
+ΓÿÉ Admin can delete an employee.
+ΓÿÉ Delete requires confirmation.
+ΓÿÉ Deleted employee disappears immediately.
+ΓÿÉ Admin can view employee details.
+ΓÿÉ Certificates tab works.
+ΓÿÉ Assessments tab works.
+ΓÿÉ Tabs switch without page reload.
+ΓÿÉ Only the selected employee's records are displayed.
+ΓÿÉ Empty states work.
+ΓÿÉ Employee sees their own profile.
+ΓÿÉ Employee sees their own certificates.
+ΓÿÉ Employee sees their own assessments.
+ΓÿÉ Employee cannot access Admin Dashboard.
+ΓÿÉ Employee cannot manage employees.
+ΓÿÉ Employee cannot modify records.
+ΓÿÉ Navigation works.
+ΓÿÉ Forms and validation work.
+ΓÿÉ Responsive layout works.
+ΓÿÉ No major browser console errors.
+ΓÿÉ No broken links or non-functional buttons.
+27. Implementation Rules for the AI Coding Agent
+Before modifying the project, the coding agent must:
+Inspect the entire existing codebase.
+Identify current routes, components, state, mock data, incomplete functionality, and errors.
+Reuse working code where appropriate.
+Implement the PRD completely rather than rebuilding blindly.
+The agent must:
+Implement real functionality instead of simulating it.
+Avoid placeholder features.
+Complete one workflow before moving to the next.
+Keep the specified React/Create React App architecture.
+Avoid unnecessary libraries and architecture.
+Preserve relational data relationships.
+28. Definition of Done
+The project is complete only when a user can start the application and perform the entire required workflow without manually editing source code.
+Admin workflow:
+Login as Admin ΓåÆ View employees ΓåÆ Add employee ΓåÆ Verify table update ΓåÆ Edit employee ΓåÆ Change role ΓåÆ Verify role update ΓåÆ View employee ΓåÆ Open Certificates ΓåÆ Open Assessments ΓåÆ Return to dashboard ΓåÆ Delete employee ΓåÆ Verify deletion ΓåÆ Logout
+Employee workflow:
+Login as Employee ΓåÆ Employee Dashboard ΓåÆ View profile ΓåÆ View Certificates ΓåÆ View Assessments ΓåÆ Attempt admin route ΓåÆ Verify access is denied/redirected ΓåÆ Logout
+29. Final Development Requirement
+The application must not be declared complete merely because the UI has been created.
+Before reporting completion, the coding agent must:
+Run the application.
+Check every route.
+Test Admin login.
+Test Employee login.
+Test Add Employee.
+Test Edit Employee.
+Test Role Change.
+Test Delete Employee.
+Test Employee Details.
+Test Certificates.
+Test Assessments.
+Test Employee restrictions.
+Test Logout.
+Check form validation.
+Check empty states.
+Check invalid routes.
+Check browser console for errors.
+Fix all discovered issues.
+Re-test the complete workflow.
+Only then report the implementation as complete.
+30. Scope Boundary
+Do not add the following features unless explicitly requested later:
+Attendance
+Training/course creation
+Course enrollment
+Notifications
+Email
+Payments
+Reports/analytics
+File uploads
+Certificate generation
+Backend APIs
+Database integration
+Advanced permissions
+Search/filter systems
+Complex dashboards
+Appendix A ΓÇö Implementation Instruction for the AI Coding Agent
+Read the entire PRD before modifying the code. Do not start coding until you understand the complete authentication, role-based access, employee CRUD, employee details, certificates, assessments, and state relationships.
+Inspect the existing project and identify what is implemented, incomplete, and incorrect.
+Preserve working functionality where possible.
+Implement the PRD completely.
+Do not optimize for the number of screens created; optimize for complete workflows.
+Every button, form, navigation item, tab, CRUD operation, authentication check, role change, validation rule, and route must work.
+Do not create placeholder functionality, disconnected fake data, Coming Soon features, or static screens pretending to be dynamic.
+Use Create React App and the specified React architecture.
+Do not introduce Vite, Redux, Tailwind, Bootstrap, Material UI, or unnecessary libraries.
+Keep mock data relational so it can later be replaced by a Java/Spring Boot REST API.
+Run the application and perform a complete functional audit.
+Test both Admin and Employee workflows from login through logout.
+Test invalid login, invalid employee ID, duplicate email, empty fields, deletion, role changes, empty certificates, empty assessments, and unauthorized route access.
+Fix every issue discovered during testing.
+Do not declare the project complete until all required workflows can be performed without manual source-code changes.
+At the end, provide an implementation report covering what was implemented, changed, routes, mock entities, tests performed, and any remaining issues.
+
+End of PRD

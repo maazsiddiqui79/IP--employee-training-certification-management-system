@@ -1,0 +1,144 @@
+-- ============================================================
+-- SQL DDL and DML Queries for ETCMS Application
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1. DATA DEFINITION LANGUAGE (DDL) - TABLE CREATION
+-- ------------------------------------------------------------
+
+-- Table: designations
+CREATE TABLE designations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
+
+-- Table: employees
+CREATE TABLE employees (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    designationId INT NOT NULL,
+    phone VARCHAR(50),
+    dateOfJoining DATE,
+    FOREIGN KEY (designationId) REFERENCES designations(id)
+);
+
+-- Table: users
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    employeeId INT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    lastLogin DATETIME NULL,
+    FOREIGN KEY (employeeId) REFERENCES employees(id)
+);
+
+-- Table: uploadedCertificates
+CREATE TABLE uploadedCertificates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    employeeId INT NOT NULL,
+    certificateName VARCHAR(255) NOT NULL,
+    organization VARCHAR(255) NOT NULL,
+    issueDate DATE,
+    expiryDate DATE NULL,
+    certificateId VARCHAR(100) NULL,
+    verificationUrl VARCHAR(500) NULL,
+    fileName VARCHAR(255),
+    fileType VARCHAR(100),
+    fileData BLOB NULL,
+    status VARCHAR(50) DEFAULT 'PENDING',
+    rejectionReason TEXT NULL,
+    uploadedAt DATETIME,
+    verifiedAt DATETIME NULL,
+    verifiedBy VARCHAR(255) NULL,
+    FOREIGN KEY (employeeId) REFERENCES employees(id)
+);
+
+-- Table: adminAssessments
+CREATE TABLE adminAssessments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    courseName VARCHAR(255),
+    assessmentDate DATE,
+    maximumMarks INT,
+    createdAt DATETIME
+);
+
+-- Table: assessment_assigned_employees
+-- (Join table to handle the many-to-many relationship of assignedEmployeeIds)
+CREATE TABLE assessment_assigned_employees (
+    assessmentId INT NOT NULL,
+    employeeId INT NOT NULL,
+    PRIMARY KEY (assessmentId, employeeId),
+    FOREIGN KEY (assessmentId) REFERENCES adminAssessments(id),
+    FOREIGN KEY (employeeId) REFERENCES employees(id)
+);
+
+-- Table: assessmentResults
+CREATE TABLE assessmentResults (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    assessmentId INT NOT NULL,
+    employeeId INT NOT NULL,
+    marks INT NULL,
+    remarks TEXT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING',
+    FOREIGN KEY (assessmentId) REFERENCES adminAssessments(id),
+    FOREIGN KEY (employeeId) REFERENCES employees(id)
+);
+
+
+-- ------------------------------------------------------------
+-- 2. DATA MANIPULATION LANGUAGE (DML) - INSERTING SEED DATA
+-- ------------------------------------------------------------
+
+-- Insert into designations
+INSERT INTO designations (id, name) VALUES
+(1, 'Software Developer'),
+(2, 'QA Engineer'),
+(3, 'Project Manager'),
+(4, 'Business Analyst'),
+(5, 'DevOps Engineer');
+
+-- Insert into employees
+INSERT INTO employees (id, name, email, designationId, phone, dateOfJoining) VALUES
+(1, 'Alice Johnson', 'alice@example.com', 1, '555-0101', '2024-01-15'),
+(2, 'Bob Smith', 'bob@example.com', 2, '555-0102', '2024-02-20'),
+(3, 'Carol Williams', 'carol@example.com', 3, '555-0103', '2024-03-10'),
+(4, 'David Brown', 'david@example.com', 4, '555-0104', '2024-04-05'),
+(5, 'Eve Davis', 'eve@example.com', 5, '555-0105', '2024-05-12');
+
+-- Insert into users
+INSERT INTO users (id, employeeId, email, password, role, lastLogin) VALUES
+(1, NULL, 'admin@example.com', 'admin123', 'ADMIN', NULL),
+(2, 1, 'alice@example.com', 'alice123', 'EMPLOYEE', NULL),
+(3, 2, 'bob@example.com', 'bob123', 'EMPLOYEE', NULL),
+(4, 3, 'carol@example.com', 'carol123', 'EMPLOYEE', NULL),
+(5, 4, 'david@example.com', 'david123', 'EMPLOYEE', NULL),
+(6, 5, 'eve@example.com', 'eve123', 'EMPLOYEE', NULL);
+
+-- Insert into uploadedCertificates
+INSERT INTO uploadedCertificates (id, employeeId, certificateName, organization, issueDate, expiryDate, certificateId, verificationUrl, fileName, fileType, status, rejectionReason, uploadedAt, verifiedAt, verifiedBy) VALUES
+(1, 1, 'Python Training Certificate', 'TechCorp Academy', '2025-08-20', '2028-08-20', 'TC-PY-001', NULL, 'python-cert.pdf', 'application/pdf', 'APPROVED', NULL, '2025-08-22', '2025-08-25', 'Administrator'),
+(2, 1, 'React Developer Certificate', 'Web Academy', '2025-10-15', '2027-10-15', 'WA-REACT-042', 'https://webacademy.com/verify/WA-REACT-042', 'react-cert.pdf', 'application/pdf', 'APPROVED', NULL, '2025-10-18', '2025-10-20', 'Administrator'),
+(4, 1, 'Kubernetes Administrator', 'Linux Foundation', '2026-06-15', NULL, 'LF-CKA-XXXX', NULL, 'cka-cert.jpg', 'image/jpeg', 'REJECTED', 'Certificate ID could not be verified...', '2026-07-01', '2026-07-05', 'Administrator');
+
+-- Insert into adminAssessments
+INSERT INTO adminAssessments (id, title, description, courseName, assessmentDate, maximumMarks, createdAt) VALUES
+(1, 'Python Technical Assessment', 'Offline technical assessment covering Python fundamentals.', 'Python Training', '2026-09-10', 100, '2026-09-05'),
+(2, 'QA Tools Evaluation', 'Practical evaluation on Selenium WebDriver and JIRA.', 'Selenium Testing', '2026-09-15', 50, '2026-09-08');
+
+-- Insert into assessment_assigned_employees (Join table)
+INSERT INTO assessment_assigned_employees (assessmentId, employeeId) VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 3);
+
+-- Insert into assessmentResults
+INSERT INTO assessmentResults (id, assessmentId, employeeId, marks, remarks, status) VALUES
+(1, 1, 1, 92, 'Excellent understanding of Python and OOP.', 'COMPLETED'),
+(2, 1, 2, 81, 'Good performance. Improve advanced OOP skills.', 'COMPLETED'),
+(3, 2, 2, 44, 'Strong Selenium skills. JIRA knowledge satisfactory.', 'COMPLETED'),
+(4, 2, 3, NULL, NULL, 'PENDING');
